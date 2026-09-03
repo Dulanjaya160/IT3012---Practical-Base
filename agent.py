@@ -2,7 +2,7 @@
 import random
 from collections import deque
 import heapq
-
+import math
 
 class GreedyGridAgent:
     """A simple agent that tries to move around systematically to clear the grid."""
@@ -18,14 +18,13 @@ class GreedyGridAgent:
 
 
 class SearchAgent:
-    """
-    Practical 03 - A Goal-Based / Planning Agent.
+    
+    def manhattan_distance(self, pos, goal):
+        return int(abs(pos[0] - goal[0]) + abs(pos[1] - goal[1]))
 
-    Instead of reacting to immediate percepts, this agent builds an abstract model
-    of the world from the percept and runs an uninformed search (BFS, DFS or UCS)
-    to compute a complete plan (sequence of actions) to the nearest food pellet,
-    then executes that plan one step at a time.
-    """
+    def euclidean_distance(self, pos, goal):
+        return math.hypot(pos[0] - goal[0], pos[1] - goal[1])
+   
 
     # Map a movement action to its (dx, dy) offset. Matches execute_action() in
     # visual_grid_game.py: Up = +y, Down = -y, Left = -x, Right = +x.
@@ -130,3 +129,13 @@ class SearchAgent:
 
         # Step 1.3: return and consume the first action of the plan.
         return self.plan.pop(0)
+    
+    
+
+
+if __name__ == "__main__":
+    agent = SearchAgent()
+    start = (0, 0)
+    goal = (3, 4)
+    print("Manhattan:", agent.manhattan_distance(start, goal))   # expected 7
+    print("Euclidean:", agent.euclidean_distance(start, goal))   # expected 5.0
