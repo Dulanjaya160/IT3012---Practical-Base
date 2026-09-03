@@ -175,6 +175,9 @@ class SearchAgent:
                 self.plan = self.dfs_search(start, goal, grid_size, walls)
             elif self.active_algo == 'UCS':
                 self.plan = self.ucs_search(start, goal, grid_size, walls)
+            elif self.active_algo == 'AStar':
+                # use manhattan by default for A*
+                self.plan = self.astar_search(start, goal, walls, grid_size, heuristic_type='manhattan')
 
             # If search failed (e.g. food walled off), fall back to a single step.
             if not self.plan:
