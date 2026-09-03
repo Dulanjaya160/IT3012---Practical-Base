@@ -4,6 +4,7 @@ from collections import deque
 import heapq
 import math
 
+
 class GreedyGridAgent:
     """A simple agent that tries to move around systematically to clear the grid."""
 
@@ -56,6 +57,58 @@ class SearchAgent:
             all_food,
             key=lambda f: abs(f[0] - start[0]) + abs(f[1] - start[1])
         )
+
+    def astar_search(self, start_pos, goal_pos, walls, grid_size, heuristic_type='manhattan'):
+        """
+        A* search combining g(n) and h(n): f(n) = g(n) + h(n).
+        start_pos and goal_pos are (x, y) tuples. walls is a set of blocked coordinates.
+        heuristic_type: 'manhattan' or 'euclidean'
+        Returns a list of actions (path) to reach goal_pos, or [] if none found.
+        """
+        # helper to select heuristic
+        if heuristic_type == 'euclidean':
+            heuristic = self.euclidean_distance
+        else:
+            heuristic = self.manhattan_distance
+
+        frontier = []  # heap of (f_cost, g_cost, current_pos, path_taken)
+        g0 = 0
+        h0 = heuristic(start_pos, goal_pos)
+        f0 = g0 + h0
+        heapq.heappush(frontier, (f0, g0, start_pos, []))
+        reached_states = set()
+        width, height = grid_size
+
+        while frontier:
+            f_cost, g_cost, current_pos, path_taken = heapq.heappop(frontier)
+
+            # goal test
+            if current_pos == goal_pos:
+                return path_taken
+
+            if current_pos in reached_states:
+                continue
+
+            reached_states.add(current_pos)
+
+            x, y = current_pos
+            for action, (dx, dy) in self.MOVES.items():
+                nx, ny = x + dx, y + dy
+                neighbor = (nx, ny)
+                # bounds and wall checks
+                if not (0 <= nx < width and 0 <= ny < height):
+                    continue
+                if neighbor in walls:
+                    continue
+                if neighbor in reached_states:
+                    continue
+
+                g_new = g_cost + 1
+                h_new = heuristic(neighbor, goal_pos)
+                f_new = g_new + h_new
+                heapq.heappush(frontier, (f_new, g_new, neighbor, path_taken + [action]))
+
+        return []
 
     # ------------------------------------------------------------------ searches
     def bfs_search(self, start, goal, grid_size, walls):
